@@ -54,27 +54,24 @@ Return strictly JSON:
 
         const aiResponse = await askAi(messages);
 
-console.log("RAW AI RESPONSE:", aiResponse); // 🔥 debug
+        let cleaned = aiResponse.trim();
 
-let cleaned = aiResponse.trim();
+        if (cleaned.startsWith("```json")) {
+              cleaned = cleaned.replace(/^```json\s*/, "").replace(/\s*```$/, "").trim();
+        } else if (cleaned.startsWith("```")) {
+              cleaned = cleaned.replace(/^```\s*/, "").replace(/\s*```$/, "").trim();
+        }
 
-// remove ```json or ``` wrappers
-if (cleaned.startsWith("```json")) {
-  cleaned = cleaned.replace(/^```json\s*/, "").replace(/\s*```$/, "").trim();
-} else if (cleaned.startsWith("```")) {
-  cleaned = cleaned.replace(/^```\s*/, "").replace(/\s*```$/, "").trim();
-}
+        let parsed;
 
-let parsed;
-
-try {
-  parsed = JSON.parse(cleaned);
-} catch (err) {
-  console.log("JSON PARSE ERROR:", cleaned);
-  return res.status(500).json({
-    message: "AI returned invalid JSON",
-  });
-}
+        try {
+              parsed = JSON.parse(cleaned);
+        } catch (err) {
+              console.log("JSON PARSE ERROR:", cleaned);
+              return res.status(500).json({
+                    message: "AI returned invalid JSON",
+        });
+        }
         
         fs.unlinkSync(filepath)
         res.json({
@@ -308,7 +305,24 @@ Answer: ${answer}
         ];
 
         const aiResponse = await askAi(messages)
-        const parsed = JSON.parse(aiResponse);
+        let cleaned = aiResponse.trim();
+
+        if (cleaned.startsWith("```json")) {
+              cleaned = cleaned.replace(/^```json\s*/, "").replace(/\s*```$/, "").trim();
+        } else if (cleaned.startsWith("```")) {
+              cleaned = cleaned.replace(/^```\s*/, "").replace(/\s*```$/, "").trim();
+        }
+
+        let parsed;
+
+        try {
+              parsed = JSON.parse(cleaned);
+        } catch (err) {
+              console.log("JSON PARSE ERROR:", cleaned);
+              return res.status(500).json({
+                    message: "AI returned invalid JSON",
+        });
+        }
         question.answer= answer;
         question.confidence = parsed.confidence;
         question.communication=parsed.communication;
